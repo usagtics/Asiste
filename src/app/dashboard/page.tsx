@@ -1,5 +1,4 @@
 "use client";
-
 export default function DashboardOverview() {
   const stats = [
     { title: "Empleados Activos", value: "248", trend: "+12% este mes", color: "from-usagBlue to-[#2f457d]" },
@@ -41,7 +40,7 @@ export default function DashboardOverview() {
           </div>
           <h3 className="text-lg font-bold text-usagBlue">Módulo de Actividad Reciente</h3>
           <p className="text-[0.85rem] font-medium text-usagBlue/50 max-w-sm mx-auto leading-relaxed">
-            Aquí implementaremos la tabla de los últimos registros biométricos o gráficas de asistencia en el siguiente paso.
+            Aquí implementaremos la tabla de los últimos registros biométricos o gráficas de asistencia s
           </p>
         </div>
       </div>

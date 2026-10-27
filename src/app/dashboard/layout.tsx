@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +12,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCatalogosOpen, setIsCatalogosOpen] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const catalogosItems = [
     { name: "Empleados", href: "/dashboard/empleados", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" },
@@ -21,13 +21,18 @@ export default function DashboardLayout({
     { name: "Reglas de Asistencia", href: "/dashboard/reglas-asistencia", icon: "M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" },
   ];
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    document.documentElement.classList.toggle('dark');
+  };
+
   return (
-    <div className="min-h-screen bg-[#F4F7F9] flex font-sans selection:bg-blue-200 selection:text-blue-900">
+    <div className="min-h-screen bg-[#F4F7F9] dark:bg-gray-900 flex font-sans selection:bg-blue-200 selection:text-blue-900 transition-colors duration-300">
       
       <aside 
         className={`${
           isSidebarOpen ? "w-[260px]" : "w-[88px]"
-        } bg-linear-to-b from-usagBlue via-usagBlue to-[#131f40] text-white transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.04)]`}
+        } bg-linear-to-b from-usagBlue via-usagBlue to-[#131f40] dark:from-gray-900 dark:via-gray-900 dark:to-black text-white transition-all duration-400 ease-[cubic-bezier(0.25,1,0.5,1)] flex flex-col relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.04)] dark:border-r dark:border-gray-800`}
       >
         <div className="absolute top-0 left-0 w-full h-64 bg-linear-to-b from-white/5 to-transparent pointer-events-none"></div>
 
@@ -59,7 +64,7 @@ export default function DashboardLayout({
             href="/dashboard"
             className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
               pathname === "/dashboard" 
-                ? "text-white shadow-lg shadow-black/10" 
+                ? "text-white shadow-lg shadow-black/10 bg-white/10" 
                 : "text-blue-100/50 hover:text-white hover:bg-white/5"
             }`}
           >
@@ -74,7 +79,6 @@ export default function DashboardLayout({
             </span>
           </Link>
 
-          {/* Sección de Catálogos desplegable */}
           <div className="pt-2">
             {isSidebarOpen && (
               <p className="px-4 text-[0.65rem] font-bold text-blue-100/40 uppercase tracking-widest mb-2">
@@ -112,7 +116,7 @@ export default function DashboardLayout({
               href="/dashboard/asistencias"
               className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
                 pathname === "/dashboard/asistencias" 
-                  ? "text-white shadow-lg shadow-black/10" 
+                  ? "text-white shadow-lg shadow-black/10 bg-white/10" 
                   : "text-blue-100/50 hover:text-white hover:bg-white/5"
               }`}
             >
@@ -131,7 +135,7 @@ export default function DashboardLayout({
               href="/dashboard/reportes"
               className={`flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
                 pathname === "/dashboard/reportes" 
-                  ? "text-white shadow-lg shadow-black/10" 
+                  ? "text-white shadow-lg shadow-black/10 bg-white/10" 
                   : "text-blue-100/50 hover:text-white hover:bg-white/5"
               }`}
             >
@@ -171,16 +175,33 @@ export default function DashboardLayout({
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden relative">
         
-        <header className="h-24 bg-[#F4F7F9]/70 backdrop-blur-2xl flex items-center justify-between px-10 z-10 shrink-0">
+        <header className="h-24 bg-[#F4F7F9]/70 dark:bg-gray-900/70 backdrop-blur-2xl flex items-center justify-between px-10 z-10 shrink-0 transition-colors duration-300 border-b border-transparent dark:border-gray-800">
           
           <div className="flex items-center gap-3 text-[0.8rem] font-bold uppercase tracking-widest text-gray-400">
-            <span className="text-gray-400/60 hidden sm:block">USAG</span>
-            <span className="text-gray-300 hidden sm:block">/</span>
-            <span className="text-usagBlue">Portal Administrativo</span>
+            <span className="text-gray-400/60 dark:text-gray-500 hidden sm:block">USAG</span>
+            <span className="text-gray-300 dark:text-gray-600 hidden sm:block">/</span>
+            <span className="text-usagBlue dark:text-white transition-colors duration-300">Portal Administrativo</span>
           </div>
           
           <div className="flex items-center gap-6">
-            <button className="relative p-2 text-gray-400 hover:text-usagBlue transition-all hover:scale-110 focus:outline-none">
+            
+            <button 
+              onClick={toggleDarkMode}
+              className="p-2 text-gray-400 hover:text-usagBlue dark:text-gray-500 dark:hover:text-amber-400 transition-all hover:scale-110 focus:outline-none bg-white dark:bg-gray-800 rounded-full shadow-sm border border-gray-100 dark:border-gray-700"
+              title={isDarkMode ? "Cambiar a Modo Claro" : "Cambiar a Modo Oscuro"}
+            >
+              {isDarkMode ? (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-amber-400">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-indigo-500">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                </svg>
+              )}
+            </button>
+
+            <button className="relative p-2 text-gray-400 hover:text-usagBlue dark:hover:text-blue-400 transition-all hover:scale-110 focus:outline-none">
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.6)]"></span>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -189,7 +210,7 @@ export default function DashboardLayout({
             
             <Link 
               href="/login" 
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-[0.75rem] font-bold text-gray-500 hover:text-rose-500 hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)] transition-all duration-300 uppercase tracking-widest"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-gray-800 text-[0.75rem] font-bold text-gray-500 dark:text-gray-300 hover:text-rose-500 dark:hover:text-rose-400 border border-transparent dark:border-gray-700 hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)] transition-all duration-300 uppercase tracking-widest"
             >
               Cerrar Sesión
             </Link>
@@ -204,3 +225,4 @@ export default function DashboardLayout({
     </div>
   );
 }
+
