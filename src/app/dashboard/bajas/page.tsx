@@ -36,6 +36,7 @@ export default function BajasLaboralesPage() {
 
   const [errorInput, setErrorInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isActionLoading, setIsActionLoading] = useState<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -127,6 +128,64 @@ export default function BajasLaboralesPage() {
       setErrorInput("No se pudo conectar con el servidor.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const calcularFiniquito = async (idBaja: number) => {
+    if (!window.confirm("¿Deseas calcular el finiquito para esta baja?")) return;
+
+    try {
+      setIsActionLoading(idBaja);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://localhost:7097/api/bajas/${idBaja}/finiquito`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ fechaPago: new Date().toISOString().split("T")[0] })
+      });
+
+      if (response.ok) {
+        alert("¡Finiquito calculado con éxito!");
+        fetchDatosEstructurales();
+      } else {
+        const errorText = await response.text();
+        alert(`Error al calcular: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+      alert("No se pudo conectar con el servidor.");
+    } finally {
+      setIsActionLoading(null);
+    }
+  };
+
+  const marcarComoPagada = async (idBaja: number) => {
+    if (!window.confirm("¿Deseas marcar esta baja como pagada?")) return;
+
+    try {
+      setIsActionLoading(idBaja);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`https://localhost:7097/api/bajas/${idBaja}/pagada`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        fetchDatosEstructurales();
+      } else {
+        const errorText = await response.text();
+        alert(`Error al marcar pagada: ${errorText}`);
+      }
+    } catch (error) {
+      console.error("Error de conexión:", error);
+      alert("No se pudo conectar con el servidor.");
+    } finally {
+      setIsActionLoading(null);
     }
   };
 
@@ -264,15 +323,37 @@ export default function BajasLaboralesPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button 
-                        onClick={() => abrirEdicion(item)}
-                        className="p-2 text-usagBlue/70 bg-usagBlue/5 hover:bg-usagBlue/10 rounded-lg transition-all" 
-                        title="Editar"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
-                        </svg>
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        <button 
+                          onClick={() => itemId && calcularFiniquito(itemId)}
+                          disabled={isActionLoading === itemId}
+                          className="px-3 py-1.5 text-xs font-bold text-usagBlue bg-usagBlue/10 hover:bg-usagBlue/20 rounded-lg transition-all"
+                          title="Calcular Finiquito"
+                        >
+                          Calcular
+                        </button>
+
+                        {item.estatusPago !== 'Pagado' && (
+                          <button 
+                            onClick={() => itemId && marcarComoPagada(itemId)}
+                            disabled={isActionLoading === itemId}
+                            className="px-3 py-1.5 text-xs font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-all"
+                            title="Marcar como Pagada"
+                          >
+                            Pagar
+                          </button>
+                        )}
+
+                        <button 
+                          onClick={() => abrirEdicion(item)}
+                          className="p-2 text-usagBlue/70 bg-usagBlue/5 hover:bg-usagBlue/10 rounded-lg transition-all" 
+                          title="Editar"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                          </svg>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

@@ -1,0 +1,113 @@
+import React from "react";
+
+interface TablaCampusProps {
+  campus: any[];
+  isLoading: boolean;
+  searchTerm: string;
+  onSearchChange: (val: string) => void;
+  onNuevoCampus: () => void;
+  onEditar: (camp: any) => void;
+  onDesactivar: (id: string, nombre: string) => void;
+  onReactivar: (camp: any) => void;
+  userRole: string;
+}
+
+export const TablaCampus = ({
+  campus,
+  isLoading,
+  searchTerm,
+  onSearchChange,
+  onNuevoCampus,
+  onEditar,
+  onDesactivar,
+  onReactivar,
+  userRole
+}: TablaCampusProps) => {
+  return (
+    <div className="max-w-7xl mx-auto space-y-8 animate-fade-in-up relative">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-extrabold text-usagBlue dark:text-white tracking-tight">Campus</h1>
+          <p className="text-usagBlue/60 dark:text-blue-200/70 text-sm font-medium tracking-wide">
+            Administración de planteles e instalaciones institucionales.
+          </p>
+        </div>
+        
+        {userRole === 'admin' && (
+          <button 
+            onClick={onNuevoCampus}
+            className="bg-gradient-to-r from-usagBlue to-[#2f457d] text-white px-6 py-2.5 rounded-xl font-bold tracking-wide text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Nuevo Campus
+          </button>
+        )}
+      </div>
+
+      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-usagBlue/5 dark:border-gray-700 overflow-hidden">
+        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+          <div className="relative w-full md:w-96">
+            <input 
+              type="text" 
+              placeholder="Buscar por clave, campus o dirección..." 
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="w-full pl-4 pr-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:border-usagBlue dark:text-gray-200"
+            />
+          </div>
+        </div>
+
+        <div className="overflow-x-auto min-h-[300px] relative">
+          {isLoading && (
+             <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm z-10 flex items-center justify-center">
+                <svg className="animate-spin h-8 w-8 text-usagBlue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+             </div>
+          )}
+
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 text-[0.65rem] uppercase tracking-widest text-usagBlue/50">
+                <th className="px-6 py-4 font-bold">Clave</th>
+                <th className="px-6 py-4 font-bold">Nombre del Campus</th>
+                <th className="px-6 py-4 font-bold">Dirección</th>
+                <th className="px-6 py-4 font-bold">Estatus</th>
+                {userRole === 'admin' && <th className="px-6 py-4 font-bold text-right">Acciones</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50 dark:divide-gray-700">
+              {campus.map((camp) => (
+                <tr key={camp.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-700/50 transition-colors">
+                  <td className="px-6 py-4"><span className="text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-md">{camp.clave}</span></td>
+                  <td className="px-6 py-4"><p className="text-sm font-bold text-gray-800 dark:text-gray-100">{camp.nombre}</p></td>
+                  <td className="px-6 py-4"><p className="text-sm font-semibold text-gray-700 dark:text-gray-300">{camp.direccion}</p></td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${camp.activo ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"}`}>
+                      {camp.activo ? "Activo" : "Inactivo"}
+                    </span>
+                  </td>
+                  {userRole === 'admin' && (
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => onEditar(camp)} className="p-2 text-usagBlue bg-usagBlue/5 rounded-lg cursor-pointer" title="Editar">✏️</button>
+                        {camp.activo ? (
+                          <button onClick={() => onDesactivar(camp.id, camp.nombre)} className="p-2 text-rose-600 bg-rose-50 rounded-lg cursor-pointer" title="Desactivar">🗑️</button>
+                        ) : (
+                          <button onClick={() => onReactivar(camp)} className="p-2 text-emerald-600 bg-emerald-50 rounded-lg cursor-pointer" title="Reactivar">🔄</button>
+                        )}
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
